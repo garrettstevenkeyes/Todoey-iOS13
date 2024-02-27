@@ -20,23 +20,7 @@ class ToDoListViewController: UITableViewController {
         super.viewDidLoad()
         
         
-        
-        let newItem = CellItem()
-        newItem.title = "Find Mike"
-        itemArray.append(newItem)
-        
-        let newItem2 = CellItem()
-        newItem2.title = "Buy Eggos"
-        itemArray.append(newItem2)
-        
-        let newItem3 = CellItem()
-        newItem3.title = "destroy demogorgon"
-        itemArray.append(newItem3)
-        
-        // Do any additional setup after loading the view.
-//        if let items = defaults.array(forKey: "TodoListArry") as? [CellItem] {
-//            itemArray = items
-//        }
+        loadItems()
     }
     
     //MARK - Tableview DataSource Methods
@@ -99,6 +83,8 @@ class ToDoListViewController: UITableViewController {
     }
     
     // this method allows you to save items intem the plist database by using the propertyencoder
+    
+    //we are encoding our data into something that can be saved into a plist form here to be stored
     func saveItems() {
         //instantialize the encoder
         let encoder = PropertyListEncoder()
@@ -114,6 +100,19 @@ class ToDoListViewController: UITableViewController {
         }
         
         self.tableView.reloadData()
+    }
+    
+    //we are decoding our data from a format of the plist into an array of CellItem
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([CellItem].self, from: data)
+            } catch {
+                print("Error decoding data \(error)")
+            }
+            
+        }
     }
 }
 
