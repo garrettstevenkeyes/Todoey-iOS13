@@ -7,20 +7,22 @@
 //
 
 import UIKit
+import CoreData
 
 class ToDoListViewController: UITableViewController {
     
     // Define list of items for table display
     var itemArray = [CellItem]()
     
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     // view did load function, there by default
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
-        loadItems()
+//        loadItems()
     }
     
     //MARK - Tableview DataSource Methods
@@ -62,9 +64,9 @@ class ToDoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { action in
             //what happens when the add item is clicked
             
-            let newItem = CellItem()
+            let newItem = CellItem(context: self.context)
             newItem.title = textField.text!
-            
+            newItem.done = false
             self.itemArray.append(newItem)
             
             self.saveItems()
@@ -86,33 +88,28 @@ class ToDoListViewController: UITableViewController {
     
     //we are encoding our data into something that can be saved into a plist form here to be stored
     func saveItems() {
-        //instantialize the encoder
-        let encoder = PropertyListEncoder()
         //wrap it in a do catch to make sure it works
         do {
-            //let it try to encode the data and save to the data variable if it works
-            let data = try encoder.encode(itemArray)
-            //try to write it to the database
-            try data.write(to: dataFilePath!)
-        //if any of these steps fail then print an error
+            
+            try context.save()
         } catch {
-            print("Error encoding item array, \(error)")
+            print("Error saving context \(error)")
         }
         
         self.tableView.reloadData()
     }
     
-    //we are decoding our data from a format of the plist into an array of CellItem
-    func loadItems() {
-        if let data = try? Data(contentsOf: dataFilePath!) {
-            let decoder = PropertyListDecoder()
-            do {
-                itemArray = try decoder.decode([CellItem].self, from: data)
-            } catch {
-                print("Error decoding data \(error)")
-            }
-            
-        }
-    }
+//    // Mark: - Core Data Saving Support
+//    func loadItems() {
+//        if let data = try? Data(contentsOf: dataFilePath!) {
+//            let decoder = PropertyListDecoder()
+//            do {
+//                itemArray = try decoder.decode([CellItem].self, from: data)
+//            } catch {
+//                print("Error decoding data \(error)")
+//            }
+//            
+//        }
+//    }
 }
 
