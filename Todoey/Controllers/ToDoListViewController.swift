@@ -46,7 +46,10 @@ class ToDoListViewController: UITableViewController {
 
     //MARK - TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        //remove item from context
+//        context.delete(itemArray[indexPath.row])
+        //remove item from item array
+//        itemArray.remove(at: indexPath.row)
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
         saveItems()
@@ -98,10 +101,10 @@ class ToDoListViewController: UITableViewController {
     }
     
     // Mark: - Core Data Saving Support
-    func loadItems() {
+    func loadItems(with request: NSFetchRequest<CellItem> = CellItem.fetchRequest()) {
         // make a request to get the data from core data
         // NSFetchRequest is a description of search criteria used to retrieve data from a persistent store.
-        let request: NSFetchRequest<CellItem> = CellItem.fetchRequest()
+        
         do {
             //wrapped in a try because the request could fail
             // try to get the data
@@ -114,3 +117,19 @@ class ToDoListViewController: UITableViewController {
     }
 }
 
+// if we follow the approach of using an extension we can extend the
+// capabilities of the ToDoListViewController so we can
+//MARK: - Search bar methods
+extension ToDoListViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        //create request
+        let request: NSFetchRequest<CellItem> = CellItem.fetchRequest()
+        //modify it with our query
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        //modify it with our sort descriptor
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
+        loadItems(with: request)
+        
+    }
+}
