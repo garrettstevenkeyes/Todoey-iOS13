@@ -22,7 +22,7 @@ class ToDoListViewController: UITableViewController {
         
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
-//        loadItems()
+        loadItems()
     }
     
     //MARK - Tableview DataSource Methods
@@ -79,8 +79,6 @@ class ToDoListViewController: UITableViewController {
                 
         alert.addAction(action)
         
-        
-        
         present(alert, animated: true, completion: nil)
     }
     
@@ -99,17 +97,20 @@ class ToDoListViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
-//    // Mark: - Core Data Saving Support
-//    func loadItems() {
-//        if let data = try? Data(contentsOf: dataFilePath!) {
-//            let decoder = PropertyListDecoder()
-//            do {
-//                itemArray = try decoder.decode([CellItem].self, from: data)
-//            } catch {
-//                print("Error decoding data \(error)")
-//            }
-//            
-//        }
-//    }
+    // Mark: - Core Data Saving Support
+    func loadItems() {
+        // make a request to get the data from core data
+        // NSFetchRequest is a description of search criteria used to retrieve data from a persistent store.
+        let request: NSFetchRequest<CellItem> = CellItem.fetchRequest()
+        do {
+            //wrapped in a try because the request could fail
+            // try to get the data
+            itemArray = try context.fetch(request)
+        } catch {
+            //print the error
+            print("Error fetching data from context \(error)")
+        }
+        
+    }
 }
 
