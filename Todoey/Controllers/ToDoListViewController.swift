@@ -20,6 +20,7 @@ class ToDoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // to get the file path
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
         loadItems()
@@ -91,7 +92,6 @@ class ToDoListViewController: UITableViewController {
     func saveItems() {
         //wrap it in a do catch to make sure it works
         do {
-            
             try context.save()
         } catch {
             print("Error saving context \(error)")
@@ -131,5 +131,15 @@ extension ToDoListViewController: UISearchBarDelegate {
         
         loadItems(with: request)
         
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+        }
     }
 }
